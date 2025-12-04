@@ -60,3 +60,4 @@ class ProductionConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = f"postgresql://{db_user}:{db_password}@{db_url}"
     LOG_LEVEL = logging.ERROR
     LOG_TO_STDOUT = True
+    DEBUG_TB_ENABLED = False  # Explicitly disable debug toolbar

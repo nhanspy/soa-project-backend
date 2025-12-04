@@ -33,7 +33,15 @@ def create_app():
 
     # Attach db vào app ở đây, an toàn hơn
     db.init_app(app)
-    toolbar.init_app(app)
+    
+    # Chỉ khởi tạo DebugToolbar nếu được enable
+    if app.config.get("DEBUG_TB_ENABLED", False):
+        try:
+            toolbar.init_app(app)
+            logger.info("Debug toolbar initialized")
+        except Exception as e:
+            logger.warning(f"Failed to initialize debug toolbar: {e}")
+    
     migrate.init_app(app, db)
     bcrypt.init_app(app)
 
@@ -68,6 +76,11 @@ def create_app():
 
     # shell context for flask cli
     app.shell_context_processor({"app": app, "db": db})
+
+    # Add simple health check endpoint
+    @app.route('/health')
+    def health_check():
+        return jsonify({"status": "healthy", "message": "Service is running"}), 200
 
     logger.info("Application setup completed successfully")
     return app
