@@ -13,6 +13,16 @@
                 }
             ],
             "essential": true,
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:80/api/users/ping || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            },
             "environment": [
                 {
                     "name": "ENVIRONMENT",
@@ -24,11 +34,11 @@
                 },
                 {
                     "name": "FLASK_DEBUG",
-                    "value": "1"
+                    "value": "0"
                 },
                 {
                     "name": "APP_SETTINGS",
-                    "value": "project.config.DevelopmentConfig"
+                    "value": "project.config.ProductionConfig"
                 },
                 {
                     "name": "PORT",
@@ -87,8 +97,8 @@
     "requiresCompatibilities": [
         "FARGATE"
     ],
-    "cpu": "256",
-    "memory": "512",
+    "cpu": "512",
+    "memory": "1024",
     "runtimePlatform": {
         "cpuArchitecture": "X86_64",
         "operatingSystemFamily": "LINUX"

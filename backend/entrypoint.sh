@@ -2,6 +2,9 @@
 echo "Waiting for postgres..."
 set -e  # Exit ngay nếu bất kỳ lệnh nào thất bại
 
+# Graceful shutdown handler
+trap 'echo "Received shutdown signal, exiting gracefully..."; exit 0' SIGTERM SIGINT
+
 # Thêm timeout để tránh loop vô hạn (ví dụ: 60 giây)
 counter=0
 while ! nc -z $DB_URL $DB_PORT; do
@@ -27,4 +30,5 @@ python manage.py seed_db || {
 }
 
 echo "Starting Flask application..."
-gunicorn -b 0.0.0.0:$PORT manage:app
+# Start gunicorn with graceful shutdown
+exec gunicorn -b 0.0.0.0:$PORT --timeout 120 --workers 2 --preload manage:app
