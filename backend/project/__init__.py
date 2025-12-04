@@ -71,3 +71,4 @@ def create_app():
 
     logger.info("Application setup completed successfully")
     return app
+
