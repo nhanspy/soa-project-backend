@@ -14,10 +14,17 @@ while ! nc -z $DB_URL $DB_PORT; do
 done
 echo "PostgreSQL started"
 
+# Chạy setup_db với error handling
+echo "Setting up database..."
+python manage.py recreate_db || {
+    echo "Error: Failed to recreate database"
+    exit 1
+}
 
-# Chạy setup_db với debug
+python manage.py seed_db || {
+    echo "Error: Failed to seed database"
+    exit 1
+}
 
-python manage.py recreate_db
-python manage.py seed_db
-
+echo "Starting Flask application..."
 gunicorn -b 0.0.0.0:$PORT manage:app

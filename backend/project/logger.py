@@ -20,43 +20,50 @@ class Logger:
         
         # Create logs directory if it doesn't exist
         log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'logs')
-        os.makedirs(log_dir, exist_ok=True)
+        try:
+            os.makedirs(log_dir, exist_ok=True)
+        except Exception as e:
+            # If we can't create logs directory, just use console logging
+            print(f"Warning: Could not create logs directory {log_dir}: {e}")
         
         # Console handler
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.DEBUG)
         
-        # File handler with rotation
-        log_file = os.path.join(log_dir, 'app.log')
-        file_handler = RotatingFileHandler(
-            log_file, 
-            maxBytes=10*1024*1024,  # 10MB
-            backupCount=5
-        )
-        file_handler.setLevel(logging.INFO)
-        
-        # Error file handler
-        error_log_file = os.path.join(log_dir, 'error.log')
-        error_handler = RotatingFileHandler(
-            error_log_file,
-            maxBytes=10*1024*1024,  # 10MB
-            backupCount=5
-        )
-        error_handler.setLevel(logging.ERROR)
-        
         # Formatter
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         )
-        
         console_handler.setFormatter(formatter)
-        file_handler.setFormatter(formatter)
-        error_handler.setFormatter(formatter)
         
-        # Add handlers to logger
+        # Add console handler first (always available)
         self.logger.addHandler(console_handler)
-        self.logger.addHandler(file_handler)
-        self.logger.addHandler(error_handler)
+        
+        # Try to add file handlers only if directory is writable
+        try:
+            # File handler with rotation
+            log_file = os.path.join(log_dir, 'app.log')
+            file_handler = RotatingFileHandler(
+                log_file, 
+                maxBytes=10*1024*1024,  # 10MB
+                backupCount=5
+            )
+            file_handler.setLevel(logging.INFO)
+            file_handler.setFormatter(formatter)
+            self.logger.addHandler(file_handler)
+            
+            # Error file handler
+            error_log_file = os.path.join(log_dir, 'error.log')
+            error_handler = RotatingFileHandler(
+                error_log_file,
+                maxBytes=10*1024*1024,  # 10MB
+                backupCount=5
+            )
+            error_handler.setLevel(logging.ERROR)
+            error_handler.setFormatter(formatter)
+            self.logger.addHandler(error_handler)
+        except Exception as e:
+            print(f"Warning: Could not setup file logging: {e}")
     
     def debug(self, message, *args, **kwargs):
         """Log debug message"""
