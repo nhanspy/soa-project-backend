@@ -8,6 +8,7 @@ from project.api.models import User
 from project import db, bcrypt
 from project.api.utils import authenticate
 from project.logger import get_logger
+from flask_cors import cross_origin
 
 # Get logger for this module
 logger = get_logger('auth_api')
@@ -17,6 +18,7 @@ auth_blueprint = Blueprint("auth", __name__)
 
 
 @auth_blueprint.route("/register", methods=["POST"])
+@cross_origin()
 def register_user():
     logger.info("User registration attempt")
     
@@ -80,6 +82,7 @@ def register_user():
 
 
 @auth_blueprint.route("/login", methods=["POST"])
+@cross_origin()
 def login_user():
     logger.info("User login attempt")
     
@@ -140,6 +143,7 @@ def login_user():
 
 
 @auth_blueprint.route("/logout", methods=["GET"])
+@cross_origin()
 @authenticate
 def logout_user(resp):
     logger.info(f"User logout - user_id: {resp}")
@@ -163,6 +167,7 @@ def logout_user(resp):
 
 
 @auth_blueprint.route("/status", methods=["GET"])
+@cross_origin()
 @authenticate
 def get_user_status(resp):
     logger.debug(f"Getting user status for user_id: {resp}")
