@@ -145,3 +145,4 @@ jobs:
           echo "🚀 Service: ${{ env.ECS_SERVICE }}"
           echo "📦 Image: ${{ env.IMAGE_URI }}"
           echo "📝 Task Definition: ${{ steps.deploy.outputs.task-definition-arn }}"
+
